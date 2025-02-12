@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>报表时间选择逻辑演示</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 2rem;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .demo-section {
+            margin: 2rem 0;
+            padding: 1.5rem;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+        .time-selector {
+            background-color: #f5f5f5;
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+        .result {
+            background-color: #e8f4ff;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+        code {
+            background-color: #eee;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+    </style>
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <h2 class="mb-4">报表时间选择逻辑演示</h2>
+
+        <!-- 年选择演示 -->
+        <div class="demo-section">
+            <h4>1. 年报表</h4>
+            <div class="time-selector">
+                <select class="form-select" id="yearSelect">
+                    <option value="2023">2023</option>
+                    <option value="2024" selected>2024</option>
+                    <option value="2025">2025</option>
+                </select>
+            </div>
+            <div class="result" id="yearResult"></div>
+        </div>
+
+        <!-- 季选择演示 -->
+        <div class="demo-section">
+            <h4>2. 季报表</h4>
+            <div class="time-selector">
+                <select class="form-select" id="quarterYear" style="width: 100px; display: inline-block">
+                    <option value="2023">2023</option>
+                    <option value="2024" selected>2024</option>
+                </select>
+                <select class="form-select" id="quarterSelect" style="width: 120px; display: inline-block">
+                    <option value="Q1">第一季度</option>
+                    <option value="Q2">第二季度</option>
+                    <option value="Q3">第三季度</option>
+                    <option value="Q4">第四季度</option>
+                </select>
+            </div>
+            <div class="result" id="quarterResult"></div>
+        </div>
+
+        <!-- 月选择演示 -->
+        <div class="demo-section">
+            <h4>3. 月报表</h4>
+            <div class="time-selector">
+                <input type="month" class="form-control" id="monthPicker" value="2024-01">
+            </div>
+            <div class="result" id="monthResult"></div>
+        </div>
+
+        <!-- 日选择演示 -->
+        <div class="demo-section">
+            <h4>4. 日报表</h4>
+            <div class="time-selector">
+                <input type="date" class="form-control" id="startDate" value="2024-01-01">
+                至
+                <input type="date" class="form-control" id="endDate" value="2024-01-05">
+            </div>
+            <div class="result" id="dayResult"></div>
+        </div>
+    </div>
+
+    <script>
+        // 生成示例数据
+        function generateExamples() {
+            // 年
+            const year = document.getElementById('yearSelect').value;
+            document.getElementById('yearResult').innerHTML = 
+                `时间范围：${year}-01-01 至 ${year}-12-31<br>
+                统计维度：每月数据<br>
+                示例：${Array.from({length:12}, (_,i) => `${year}-${String(i+1).padStart(2,'0')}`).join(', ')}`;
+
+            // 季
+            const quarterYear = document.getElementById('quarterYear').value;
+            const quarter = document.getElementById('quarterSelect').value;
+            const quarterMonths = {
+                Q1: ['01', '02', '03'],
+                Q2: ['04', '05', '06'],
+                Q3: ['07', '08', '09'],
+                Q4: ['10', '11', '12']
+            }[quarter];
+            document.getElementById('quarterResult').innerHTML = 
+                `时间范围：${quarterYear}-${quarterMonths[0]}-01 至 ${quarterYear}-${quarterMonths[2]}-${new Date(quarterYear, quarterMonths[2], 0).getDate()}<br>
+                统计维度：每月数据<br>
+                示例：${quarterMonths.map(m => `${quarterYear}-${m}`).join(', ')}`;
+
+            // 月
+            const month = document.getElementById('monthPicker').value;
+            const daysInMonth = new Date(month.split('-')[0], month.split('-')[1], 0).getDate();
+            document.getElementById('monthResult').innerHTML = 
+                `时间范围：${month}-01 至 ${month}-${daysInMonth}<br>
+                统计维度：每日数据<br>
+                示例：${month}-01 至 ${month}-${daysInMonth}（共${daysInMonth}天）`;
+
+            // 日
+            const start = document.getElementById('startDate').value;
+            const end = document.getElementById('endDate').value;
+            document.getElementById('dayResult').innerHTML = 
+                `时间范围：${start} 至 ${end}<br>
+                统计维度：每日数据<br>
+                示例：按天统计的每日数据`;
+        }
+
+        // 绑定事件监听
+        document.querySelectorAll('select, input').forEach(el => {
+            el.addEventListener('change', generateExamples);
+        });
+
+        // 初始化
+        generateExamples();
+    </script>
+</body>
+</html>
